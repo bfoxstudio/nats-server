@@ -42,6 +42,9 @@ func TestUserClone(t *testing.T) {
 		Username: "foo",
 		Password: "bar",
 		Permissions: &Permissions{
+			Clients: &ClientsPermission{
+				AllowedClientIds: []string{"tmp"},
+			},
 			Publish: &SubjectPermission{
 				Allow: []string{"foo"},
 			},

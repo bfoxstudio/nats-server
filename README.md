@@ -575,6 +575,8 @@ Before server `1.3.0`, it was only possible to define permissions allowing an au
 
 Each permission grant is an object with two fields: what subject(s) the authenticated user is allowed (or denied the right) to publish to, and what subject(s) the authenticated user is allowed (or denied the right) to subscribe to. The parser is generous at understanding what the intent is, so both arrays and singletons are processed. Subjects themselves can contain wildcards. Permissions make use of [variables](#variables).
 
+In new version use clients section for automatically allow subscribe and publish to  "_INBOX._CLIENTS.ClientIdXYZ.>". Not use "_INBOX.>" publish and subscribe with clients. "_INBOX.>" will be allowed to write and read other _INBOX._CLIENTS. 
+
 You set permissions by creating an entry inside of the `authorization` configuration block that conforms to the following syntax:
 ```
 authorization {
@@ -586,6 +588,9 @@ authorization {
     subscribe = {
       allow = "singleton" or ["array", ...]
       deny  = "singleton" or ["array", ...]
+    }
+    clients = {
+      allow: ["test1", "test2"]
     }
   }
 }
@@ -600,6 +605,8 @@ authorization {
   }
 }
 ```
+
+
 
 Here is an example authorization configuration that defines four users, three of whom are assigned explicit permissions.
 ```
@@ -619,6 +626,9 @@ authorization {
   DEFAULT_PERMISSIONS = {
     publish = "SANDBOX.*"
     subscribe = ["PUBLIC.>", "_INBOX.>"]
+    clients = {
+          allow: ["test1", "test2"]
+    }
   }
 
   PASS: abcdefghijklmnopqrstuvwxwz0123456789
