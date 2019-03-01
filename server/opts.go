@@ -1778,8 +1778,6 @@ func parseClients(v interface{}, errors, warnings *[]error) (*ClientsPermission,
 	return p, nil
 }
 
-
-
 // Helper function to parse old style authorization configs.
 func parseOldPermissionStyle(v interface{}, errors, warnings *[]error) (*SubjectPermission, error) {
 	subjects, err := parseSubjects(v, errors, warnings)
