@@ -4,7 +4,7 @@ go:
 - 1.11.x
 go_import_path: github.com/nats-io/gnatsd
 install:
-- go get github.com/nats-io/go-nats
+- go get github.com/bfoxstudio/go-nats
 - go get github.com/nats-io/nkeys
 - go get github.com/nats-io/jwt
 - go get github.com/mattn/goveralls
@@ -12,6 +12,7 @@ install:
 - go get -u honnef.co/go/tools/cmd/staticcheck
 - go get -u github.com/client9/misspell/cmd/misspell
 before_script:
+- mv $GOPATH/src/github.com/bfoxstudio/go-nats $GOPATH/src/github.com/nats-io/go-nats
 - EXCLUDE_VENDOR=$(go list ./... | grep -v "/vendor/")
 - go build
 - $(exit $(go fmt $EXCLUDE_VENDOR | wc -l))
