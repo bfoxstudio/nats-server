@@ -13,6 +13,11 @@ install:
 - go get -u github.com/client9/misspell/cmd/misspell
 before_script:
 - mv $GOPATH/src/github.com/bfoxstudio/go-nats $GOPATH/src/github.com/nats-io/go-nats
+- ls -a
+- pwd
+- ls $GOPATH/src/github.com/nats-io/go-nats
+- git status ./$GOPATH/src/github.com/nats-io/go-nats
+- git rev-parse HEAD
 - EXCLUDE_VENDOR=$(go list ./... | grep -v "/vendor/")
 - go build
 - $(exit $(go fmt $EXCLUDE_VENDOR | wc -l))
