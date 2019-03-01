@@ -11,13 +11,7 @@ install:
 - go get -u honnef.co/go/tools/cmd/staticcheck
 - go get -u github.com/client9/misspell/cmd/misspell
 before_script:
-- go get -u github.com/bfoxstudio/go-nats
-- mv $GOPATH/src/github.com/bfoxstudio/go-nats $GOPATH/src/github.com/nats-io/go-nats
-- ls -a
-- pwd
-- ls $GOPATH/src/github.com/nats-io/go-nats/.github
-- git status $GOPATH/src/github.com/nats-io/go-nats
-- git rev-parse HEAD
+- git clone --depth=50 --branch=new_inbox https://github.com/bfoxstudio/go-nats.git $GOPATH/src/github.com/nats-io/go-nats
 - EXCLUDE_VENDOR=$(go list ./... | grep -v "/vendor/")
 - go build
 - $(exit $(go fmt $EXCLUDE_VENDOR | wc -l))
