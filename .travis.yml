@@ -16,7 +16,7 @@ before_script:
 - ls -a
 - pwd
 - ls $GOPATH/src/github.com/nats-io/go-nats
-- git status ./$GOPATH/src/github.com/nats-io/go-nats
+- git status $GOPATH/src/github.com/nats-io/go-nats
 - git rev-parse HEAD
 - EXCLUDE_VENDOR=$(go list ./... | grep -v "/vendor/")
 - go build
