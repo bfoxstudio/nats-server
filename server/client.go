@@ -67,6 +67,9 @@ const (
 	maxBufSize      = 65536 // 64k
 	shortsToShrink  = 2     // Trigger to shrink dynamic buffers
 	maxFlushPending = 10    // Max fsps to have in order to wait for writeLoop
+
+	InboxPrefix        = "_INBOX."
+	InboxClientsPrefix = InboxPrefix + "_CLIENTS."
 )
 
 // Represent client booleans with a bitmask
@@ -595,6 +598,23 @@ func (c *client) setPermissions(perms *Permissions) {
 		for _, subSubject := range perms.Subscribe.Deny {
 			sub := &subscription{subject: []byte(subSubject)}
 			c.perms.sub.deny.Insert(sub)
+		}
+	}
+
+	if perms.Clients != nil {
+		for _, clientId := range perms.Clients.AllowedClientIds {
+			if c.perms.pub.allow == nil {
+				c.perms.pub.allow = NewSublist()
+			}
+			wildcard := InboxClientsPrefix + clientId + ".>"
+			pub := &subscription{subject: []byte(wildcard)}
+			c.perms.pub.allow.Insert(pub)
+
+			if c.perms.sub.allow == nil {
+				c.perms.sub.allow = NewSublist()
+			}
+			sub := &subscription{subject: []byte(wildcard)}
+			c.perms.sub.allow.Insert(sub)
 		}
 	}
 }
@@ -1361,7 +1381,7 @@ func (c *client) sendProto(info []byte, doFlush bool) {
 
 // Assume the lock is held upon entry.
 func (c *client) sendPong() {
-	c.traceOutOp("PONG", nil)
+	c.traceOutOp("PONG: "+c.opts.Username+" "+c.opts.Name, nil)
 	c.sendProto([]byte("PONG\r\n"), true)
 }
 
@@ -1369,7 +1389,7 @@ func (c *client) sendPong() {
 func (c *client) sendPing() {
 	c.rttStart = time.Now()
 	c.ping.out++
-	c.traceOutOp("PING", nil)
+	c.traceOutOp("PING: "+c.opts.Username+" "+c.opts.Name, nil)
 	c.sendProto([]byte("PING\r\n"), true)
 }
 
@@ -1408,7 +1428,7 @@ func (c *client) sendOK() {
 
 func (c *client) processPing() {
 	c.mu.Lock()
-	c.traceInOp("PING", nil)
+	c.traceInOp("PING: "+c.opts.Username+" "+c.opts.Name, nil)
 	if c.nc == nil {
 		c.mu.Unlock()
 		return

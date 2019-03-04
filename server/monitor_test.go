@@ -1651,7 +1651,7 @@ func createClientConnSubscribeAndPublish(t *testing.T, s *Server) *nats.Conn {
 	}
 
 	ch := make(chan bool)
-	inbox := nats.NewInbox()
+	inbox := nats.NewInboxWithPath("_TMP")
 	sub, err := nc.Subscribe(inbox, func(m *nats.Msg) { ch <- true })
 	if err != nil {
 		t.Fatalf("Error subscribing to `%s`: %v\n", inbox, err)

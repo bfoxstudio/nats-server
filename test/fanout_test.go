@@ -45,7 +45,7 @@ func TestNoRaceHighFanoutOrdering(t *testing.T) {
 	)
 
 	// make unique
-	subj := nats.NewInbox()
+	subj := nats.NewInboxWithPath("_TMP")
 
 	var wg sync.WaitGroup
 	wg.Add(nconns * nsubs)

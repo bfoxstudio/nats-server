@@ -93,6 +93,13 @@ type SubjectPermission struct {
 type Permissions struct {
 	Publish   *SubjectPermission `json:"publish"`
 	Subscribe *SubjectPermission `json:"subscribe"`
+	Clients   *ClientsPermission `json:"clients"`
+}
+
+// SubjectPermission is an individual allow and deny struct for publish
+// and subscribe authorizations.
+type ClientsPermission struct {
+	AllowedClientIds []string `json:"allowed_client_ids,omitempty"`
 }
 
 // RoutePermissions are similar to user permissions
@@ -120,6 +127,19 @@ func (p *SubjectPermission) clone() *SubjectPermission {
 	return clone
 }
 
+// clone will clone an individual client permission.
+func (p *ClientsPermission) clone() *ClientsPermission {
+	if p == nil {
+		return nil
+	}
+	clone := &ClientsPermission{}
+	if p.AllowedClientIds != nil {
+		clone.AllowedClientIds = make([]string, len(p.AllowedClientIds))
+		copy(clone.AllowedClientIds, p.AllowedClientIds)
+	}
+	return clone
+}
+
 // clone performs a deep copy of the Permissions struct, returning a new clone
 // with all values copied.
 func (p *Permissions) clone() *Permissions {
@@ -132,6 +152,9 @@ func (p *Permissions) clone() *Permissions {
 	}
 	if p.Subscribe != nil {
 		clone.Subscribe = p.Subscribe.clone()
+	}
+	if p.Clients != nil {
+		clone.Clients = p.Clients.clone()
 	}
 	return clone
 }

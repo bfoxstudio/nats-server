@@ -1683,6 +1683,13 @@ func parseUserPermissions(mv interface{}, errors, warnings *[]error) (*Permissio
 				continue
 			}
 			p.Subscribe = perms
+		case "clients":
+			perms, err := parseClientsPermissions(v, errors, warnings)
+			if err != nil {
+				*errors = append(*errors, err)
+				continue
+			}
+			p.Clients = perms
 		default:
 			if !tk.IsUsedVariable() {
 				err := &configErr{tk, fmt.Sprintf("Unknown field %q parsing permissions", k)}
@@ -1732,6 +1739,43 @@ func parseSubjects(v interface{}, errors, warnings *[]error) ([]string, error) {
 		return nil, &configErr{tk, err.Error()}
 	}
 	return subjects, nil
+}
+
+// Top level parser for authorization configurations.
+func parseClientsPermissions(v interface{}, errors, warnings *[]error) (*ClientsPermission, error) {
+	switch vv := v.(type) {
+	case map[string]interface{}:
+		// New style with allow and/or deny properties.
+		return parseClients(vv, errors, warnings)
+	}
+	return &ClientsPermission{}, nil
+}
+
+// Helper function to parse new style authorization into a SubjectPermission with Allow and Deny.
+func parseClients(v interface{}, errors, warnings *[]error) (*ClientsPermission, error) {
+	m := v.(map[string]interface{})
+	if len(m) == 0 {
+		return nil, nil
+	}
+	p := &ClientsPermission{}
+	for k, v := range m {
+		tk, _ := unwrapValue(v)
+		switch strings.ToLower(k) {
+		case "allow":
+			subjects, err := parseSubjects(tk, errors, warnings)
+			if err != nil {
+				*errors = append(*errors, err)
+				continue
+			}
+			p.AllowedClientIds = subjects
+		default:
+			if !tk.IsUsedVariable() {
+				err := &configErr{tk, fmt.Sprintf("Unknown field name %q parsing subject permissions, only 'allow' or 'deny' are permitted", k)}
+				*errors = append(*errors, err)
+			}
+		}
+	}
+	return p, nil
 }
 
 // Helper function to parse old style authorization configs.
